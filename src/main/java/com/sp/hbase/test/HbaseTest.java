@@ -12,6 +12,7 @@ import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,12 +42,13 @@ public class HbaseTest {
     }
 
     public static void main(String args[]) throws IOException {
-        createTable();
+  /*      createTable();
         put();
         batchPut();
         scan();
         get();
-        delete();
+        delete();*/
+        loopPut();
 
     }
 
@@ -97,6 +99,20 @@ public class HbaseTest {
         //获得表对象
         Table table = con.getTable(tn);
         table.put(puts);
+    }
+
+    static void loopPut() throws IOException {
+
+        List<Put> puts = new ArrayList<Put>();
+        for (int i = 0; i < 100000; i++) {
+            Put put = new Put(Bytes.toBytes("row" + i));//参数是行健
+            put.addColumn(Bytes.toBytes("fm1"), Bytes.toBytes("col" + i), Bytes.toBytes("value" + i));
+            puts.add(put);
+        }
+        //获得表对象
+        Table table = con.getTable(tn);
+        table.put(puts);
+        scan();
     }
 
     static void scan() throws IOException {
