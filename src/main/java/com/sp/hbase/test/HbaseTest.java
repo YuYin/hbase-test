@@ -26,13 +26,13 @@ public class HbaseTest {
     static {
 
         try {
-            //1.»ñµÃÅäÖÃÎÄ¼ş¶ÔÏó
+            //1.è·å¾—é…ç½®æ–‡ä»¶å¯¹è±¡
             Configuration conf = HBaseConfiguration.create();
-            //ÉèÖÃÅäÖÃ²ÎÊı:zkµØÖ·
+            //è®¾ç½®é…ç½®å‚æ•°:zkåœ°å€
             conf.set("hbase.zookeeper.quorum", "192.168.32.54");
-            //2.½¨Á¢Á¬½Ó
+            //2.å»ºç«‹è¿æ¥
             con = ConnectionFactory.createConnection(conf);
-            //3.»ñµÃ»á»°
+            //3.è·å¾—ä¼šè¯
             admin = con.getAdmin();
 
         } catch (IOException e) {
@@ -51,73 +51,73 @@ public class HbaseTest {
     }
 
     static void createTable() throws IOException {
-        //´´½¨±íÃû¶ÔÏó
-        //a.ÅĞ¶ÏÊı¾İ¿âÊÇ·ñ´æÔÚ
+        //åˆ›å»ºè¡¨åå¯¹è±¡
+        //a.åˆ¤æ–­æ•°æ®åº“æ˜¯å¦å­˜åœ¨
         if (admin.tableExists(tn)) {
-            System.out.println("====> ±í´æÔÚ£¬É¾³ı±í....");
-            //ÏÈÊ¹±íÉèÖÃÎª²»¿É±à¼­£¬¹Ø±Õ±í
+            System.out.println("====> è¡¨å­˜åœ¨ï¼Œåˆ é™¤è¡¨....");
+            //å…ˆä½¿è¡¨è®¾ç½®ä¸ºä¸å¯ç¼–è¾‘ï¼Œå…³é—­è¡¨
             admin.disableTable(tn);
-            //É¾³ı±í
+            //åˆ é™¤è¡¨
             admin.deleteTable(tn);
-            System.out.println("±íÉ¾³ı³É¹¦.....");
+            System.out.println("è¡¨åˆ é™¤æˆåŠŸ.....");
         }
-        //´´½¨±í½á¹¹¶ÔÏó
+        //åˆ›å»ºè¡¨ç»“æ„å¯¹è±¡
         HTableDescriptor htd = new HTableDescriptor(tn);
-        //´´½¨ÁĞ×å½á¹¹¶ÔÏó
+        //åˆ›å»ºåˆ—æ—ç»“æ„å¯¹è±¡
         HColumnDescriptor hcd1 = new HColumnDescriptor("fm1");
         HColumnDescriptor hcd2 = new HColumnDescriptor("fm2");
         htd.addFamily(hcd1);
         htd.addFamily(hcd2);
-        //´´½¨±í
+        //åˆ›å»ºè¡¨
         admin.createTable(htd);
-        System.out.println("±í´´½¨Íê³É.....");
+        System.out.println("è¡¨åˆ›å»ºå®Œæˆ.....");
     }
 
     static void put() throws IOException {
-        //µ¥¸ö²åÈë
-        Put put = new Put(Bytes.toBytes("row01"));//²ÎÊıÊÇĞĞ½¡row01
+        //å•ä¸ªæ’å…¥
+        Put put = new Put(Bytes.toBytes("row01"));//å‚æ•°æ˜¯è¡Œå¥row01
         put.addColumn(Bytes.toBytes("fm1"), Bytes.toBytes("col1"), Bytes.toBytes("value01"));
 
-        //»ñµÃ±í¶ÔÏó
+        //è·å¾—è¡¨å¯¹è±¡
         Table table = con.getTable(tn);
         table.put(put);
-        System.out.println("²åÈë¼ÇÂ¼Íê³É.....");
+        System.out.println("æ’å…¥è®°å½•å®Œæˆ.....");
     }
 
     static void batchPut() throws IOException {
-        Put put01 = new Put(Bytes.toBytes("row02"));//²ÎÊıÊÇĞĞ½¡
+        Put put01 = new Put(Bytes.toBytes("row02"));//å‚æ•°æ˜¯è¡Œå¥
         put01.addColumn(Bytes.toBytes("fm1"), Bytes.toBytes("col2"), Bytes.toBytes("value02"))
                 .addColumn(Bytes.toBytes("fm1"), Bytes.toBytes("col3"), Bytes.toBytes("value03"));
 
-        Put put02 = new Put(Bytes.toBytes("row03"));//²ÎÊıÊÇĞĞ½¡
+        Put put02 = new Put(Bytes.toBytes("row03"));//å‚æ•°æ˜¯è¡Œå¥
         put02.addColumn(Bytes.toBytes("fm1"), Bytes.toBytes("col4"), Bytes.toBytes("value04"));
 
         List<Put> puts = Arrays.asList(put01, put02);
 
-        //»ñµÃ±í¶ÔÏó
+        //è·å¾—è¡¨å¯¹è±¡
         Table table = con.getTable(tn);
         table.put(puts);
     }
 
     static void scan() throws IOException {
         Scan scan = new Scan();
-        //»ñµÃ±í¶ÔÏó
+        //è·å¾—è¡¨å¯¹è±¡
         Table table = con.getTable(tn);
-        //µÃµ½É¨ÃèµÄ½á¹û¼¯
+        //å¾—åˆ°æ‰«æçš„ç»“æœé›†
         ResultScanner rs = table.getScanner(scan);
         for (Result result : rs) {
-            //µÃµ½µ¥Ôª¸ñ¼¯ºÏ
+            //å¾—åˆ°å•å…ƒæ ¼é›†åˆ
             List<Cell> cs = result.listCells();
             for (Cell cell : cs) {
-                //È¡ĞĞ½¡
+                //å–è¡Œå¥
                 String rowKey = Bytes.toString(CellUtil.cloneRow(cell));
-                //È¡µ½Ê±¼ä´Á
+                //å–åˆ°æ—¶é—´æˆ³
                 long timestamp = cell.getTimestamp();
-                //È¡µ½×åÁĞ
+                //å–åˆ°æ—åˆ—
                 String family = Bytes.toString(CellUtil.cloneFamily(cell));
-                //È¡µ½ĞŞÊÎÃû
+                //å–åˆ°ä¿®é¥°å
                 String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));
-                //È¡µ½Öµ
+                //å–åˆ°å€¼
                 String value = Bytes.toString(CellUtil.cloneValue(cell));
 
                 System.out.println(" ===> rowKey : " + rowKey + ",  timestamp : " +
@@ -133,11 +133,11 @@ public class HbaseTest {
         Result r = table.get(get);
         List<Cell> cs = r.listCells();
         for (Cell cell : cs) {
-            String rowKey = Bytes.toString(CellUtil.cloneRow(cell));  //È¡ĞĞ¼ü
-            long timestamp = cell.getTimestamp();  //È¡µ½Ê±¼ä´Á
-            String family = Bytes.toString(CellUtil.cloneFamily(cell));  //È¡µ½×åÁĞ
-            String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));  //È¡µ½ĞŞÊÎÃû
-            String value = Bytes.toString(CellUtil.cloneValue(cell));  //È¡µ½Öµ
+            String rowKey = Bytes.toString(CellUtil.cloneRow(cell));  //å–è¡Œé”®
+            long timestamp = cell.getTimestamp();  //å–åˆ°æ—¶é—´æˆ³
+            String family = Bytes.toString(CellUtil.cloneFamily(cell));  //å–åˆ°æ—åˆ—
+            String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));  //å–åˆ°ä¿®é¥°å
+            String value = Bytes.toString(CellUtil.cloneValue(cell));  //å–åˆ°å€¼
 
             System.out.println(" ===> rowKey : " + rowKey + ",  timestamp : " +
                     timestamp + ", family : " + family + ", qualifier : " + qualifier + ", value : " + value);
